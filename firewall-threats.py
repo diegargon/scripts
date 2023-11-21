@@ -1,11 +1,13 @@
 """
- v0.53
+ v0.54
  
  Diego Garcia @ 2021-2023
     
- Source: google,reddit, https://threatfeeds.io/, https://firebog.net/ 
- http://iplists.firehol.org/  (lista updates)
-
+ Source:
+        https://threatfeeds.io/, https://firebog.net/ 
+        http://iplists.firehol.org/  (lista updates)        
+        google,reddit, 
+        
  Fortigate usage:
  WARNING: Fortigate max: 10 MB or 128 × 1024 (131072) entries
  I create a cronjob task in my internal webserver (24h) to launch this script
@@ -24,33 +26,33 @@ from urllib.parse import urlparse
 import re
 
 ######################################## START CONFIG ##################################################
-# Debug Output
+# Show Debug Output
 
 pDebug = set()
 pDebug = 0
 
-# Invalid Output
+# Show Invalid Output
 pDebugInvalid = set()
-pDebugInvalid = 1
+pDebugInvalid = 0
 
-# Download url lists(1)  or use already download files (testing purpose)
+# Download url lists(1)  or use the already download files (testing purpose)
 pDowload = set()
 pDownload = 1
 
 #App/Working dir
 app_path = '/opt/firewall-threat'
 
-#  Where to save downloaded files
+# Where we save downloaded files
 output_dir =  app_path +'/downloads'
 
-# Final dir
-# ip.txt domains.txt
+# Final dir  
+# ip.txt domains.txt 
 output_final_dir  = '/var/www/html/fw_rules/'
 
 
 
 # URL list, ips or domains
-# Warning: Think where you going to use (rules)  before  place lists with bogons networks
+# Warning: Think where you going to use the threads (rules)  before  place lists with bogons networks
 # Fortigate: 130000 entrys max without split files , we only split into one ip list  and one  domain list.
 
 urls = [
