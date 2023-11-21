@@ -1,21 +1,26 @@
 """
- v0.54
+ v0.55
  
  Diego Garcia @ 2021-2023
+
+This script downloads the specified IP/domain lists (blacklist), removes invalid
+and duplicate entries, and merges them into two files (ip.txt and domains.txt).
+
+Sources:
+    - https://threatfeeds.io/
+    - https://firebog.net/
+    - http://iplists.firehol.org/ (list updates)
+    - Google
+    - Reddit
+
+    Fortigate usage:
+    WARNING: Fortigate has a maximum limit of 10 MB or 128 × 1024 (131072) entries.
+    I have created a cronjob task on my internal web server (every 24 hours) to launch this script.
+    Then, Fortigate must download the final files ips.txt ("Threats IP list") and domains.txt
+    ("Threats Domain List") from your web server.
     
- Source:
-        https://threatfeeds.io/, https://firebog.net/ 
-        http://iplists.firehol.org/  (lista updates)        
-        google,reddit, 
-        
- Fortigate usage:
- WARNING: Fortigate max: 10 MB or 128 × 1024 (131072) entries
- I create a cronjob task in my internal webserver (24h) to launch this script
- Then your fortigate must download the final files ips.txt domains.txt from your 
- webserver.
+    TODO: Split big files that exceed X lines into smaller ones.
 
-
- TODO: Split files
 
 """
 
