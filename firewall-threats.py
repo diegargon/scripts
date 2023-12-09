@@ -1,7 +1,9 @@
 """
- v0.55
- 
+ v0.57
+
  Diego Garcia @ 2021-2023
+
+Latest: https://github.com/diegargon/scripts
 
 This script downloads the specified IP/domain lists (blacklist), removes invalid
 and duplicate entries, and merges them into two files (ip.txt and domains.txt).
@@ -18,7 +20,11 @@ Sources:
     I have created a cronjob task on my internal web server (every 24 hours) to launch this script.
     Then, Fortigate must download the final files ips.txt ("Threats IP list") and domains.txt
     ("Threats Domain List") from your web server.
-    
+    Beware with the memory problems in some low ram units.
+
+    OPNSense users:
+        Add to Aliases-->Url Table
+
     TODO: Split big files that exceed X lines into smaller ones.
 
 
@@ -45,13 +51,13 @@ pDowload = set()
 pDownload = 1
 
 #App/Working dir
-app_path = '/opt/firewall-threat'
+app_path = '/opt/firewall-threats'
 
 # Where we save downloaded files
 output_dir =  app_path +'/downloads'
 
-# Final dir  
-# ip.txt domains.txt 
+# Final dir
+# ip.txt domains.txt
 output_final_dir  = '/var/www/html/fw_rules/'
 
 
@@ -60,10 +66,26 @@ output_final_dir  = '/var/www/html/fw_rules/'
 # Warning: Think where you going to use the threads (rules)  before  place lists with bogons networks
 # Fortigate: 130000 entrys max without split files , we only split into one ip list  and one  domain list.
 
+# This setup  check  ed 08-12-2023 generate a list of 127k ips
 urls = [
 # Custom Blacklist
-    ('http://172.20.4.3/fw_rules/custom.txt', None),
+#    ('http://172.20.4.3/fw_rules/custom.txt', None),
+#    ('http://192.168.2.71/fw_rules/custom.txt', None),
 # New
+    # 17500 AIP-Alpha-latest.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP-Alpha-latest.csv', None),
+    # 58000 AIP-Alpha7-latest.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP-Alpha7-latest.csv', None),
+    # 18000 AIP-Prioritize_Consistent-latest
+   ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP-Prioritize_Consistent-latest.csv', None),
+    # 10000 AIP-Prioritize_New-latest.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP-Prioritize_New-latest.csv', None),
+    # 17500 AIP_blacklist_for_IPs_seen_last_24_hours.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP_blacklist_for_IPs_seen_last_24_hours.csv', None),
+    # 10000 - AIP_historical_blacklist_prioritized_by_newest_attackers.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP_historical_blacklist_prioritized_by_newest_attackers.csv', None),
+    # 18000  AIP_historical_blacklist_prioritized_by_repeated_attackers.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP_historical_blacklist_prioritized_by_repeated_attackers.csv', None),
     # Binart Defense (7000)
     ('https://www.binarydefense.com/banlist.txt', None),
     # bruteforceblocker 274
@@ -76,7 +98,7 @@ urls = [
     ('https://iplists.firehol.org/files/dyndns_ponmocup.ipset', None),
     # 1268
     ('https://iplists.firehol.org/files/firehol_webclient.netset', None),
-# Checked they update
+# Checked: they still update
     # Cins 15000
     ('http://cinsscore.com/list/ci-badguys.txt', None),
     # 600
@@ -130,7 +152,7 @@ urls = [
     # 50
     ('https://osint.digitalside.it/Threat-Intel/lists/latestdomains.txt', None),
     # 2000
-    ('https://bitbucket.org/ethanr/dns-blacklists/raw/8575c9f96e5b4a1308f2f12394abd86d0927a4a0/bad_lists/Mandiant_APT1_Report_Appendix_D.txt', None), 
+    ('https://bitbucket.org/ethanr/dns-blacklists/raw/8575c9f96e5b4a1308f2f12394abd86d0927a4a0/bad_lists/Mandiant_APT1_Report_Appendix_D.txt', None),
     # 147000 (too big need ip split)
     #    ('https://phishing.army/download/phishing_army_blocklist_extended.txt', None),
     # 145000 (too big need ip split)
@@ -138,7 +160,7 @@ urls = [
     # 1000
     ('https://gitlab.com/quidsup/notrack-blocklists/raw/master/notrack-malware.txt', None),
     # 900 Stalkerware
-    ('https://raw.githubusercontent.com/AssoEchap/stalkerware-indicators/master/generated/hosts', None), 
+    ('https://raw.githubusercontent.com/AssoEchap/stalkerware-indicators/master/generated/hosts', None),
     # 150
     ('http://www.botvrij.eu/data/ioclist.hostname.raw', None),
     # 150
@@ -275,8 +297,8 @@ def procesar_archivo(input_file, ip_output, domain_output, invalid_output):
     for line in input_file:
         line = line.strip()  # Elimina espacios en blanco y saltos de línea al inicio y final
         if line and not line.startswith('#') or line.startswith(';') or line.startswith("0.0.0.0"):  # Ignora líneas vacías y comentarios
-            # Limpiamos la linea de posibles comentarios antes de meterla 
-            line = re.split(r'#|;', line)[0].strip()
+            # Limpiamos la linea de posibles comentarios antes de meterla # , due StratosIPS list
+            line = re.split(r'#|;|,', line)[0].strip()
 
             if line not in lineas_procesadas:
 
@@ -304,4 +326,3 @@ with open(ip_output_file, 'w') as ip_output, open(domain_output_file, 'w') as do
 if pDebug:
   print(f'Final files: Ips "{ip_output_file}" Domains {domain_output_file}')
   print(f'Stats: Valid: {lineas_validas} Dup: {lineas_duplicadas} Error {lineas_errores}')
-
