@@ -2,7 +2,6 @@
 
 firewall-threads:
 
-  Works  (Checked):Opnsense (Aliases URL-TABLE)
+	Works  (Checked):Opnsense (Aliases URL-TABLE)
 
-
-  Fortigate
+	Fortigate
