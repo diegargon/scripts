@@ -169,8 +169,8 @@ urls = [
     ('http://www.botvrij.eu/data/ioclist.ip-dst.raw', None),
     #6000
     ('https://www.darklist.de/raw.php', None),
-    #5000
-    ('http://blocklist.greensnow.co/greensnow.txt', None),
+    #5000 Commented due reliability if their list (block legit ips)
+    #('http://blocklist.greensnow.co/greensnow.txt', None),
 
 # Offline
 #
