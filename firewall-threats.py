@@ -1,4 +1,4 @@
-version = 'v0.66'
+version = 'v0.67'
 """
  Diego Garcia @ 2021-2024
 
@@ -12,9 +12,9 @@ other list (some very big). If you want use just uncomment. Anyways check the st
 
 Stats ouput default list config:
 
-Stats: Number of lists:  40
-Stats: Valid: 125875 Dup: 11285 Error 89 InNet Discards 2365
-Total IPs: 57536 Total Networks: 1614 Total Domains: 66724
+Stats: Number of lists:  46
+Stats: Valid: 179963 Dup: 94370 Error 89 InNet Discards 4336
+Total IPs: 111622 Total Networks: 1614 Total Domains: 66726
 
 Breaking changes:
     None... i think
@@ -147,6 +147,20 @@ urls = [
     # ('https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Phishing-Angriffe', None),  
     # RPILIST Malware domains: Too Big Warning NOT work: need extra parsing 
     #('https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/malware', None),        
+    # 17500 AIP-Alpha-latest.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP-Alpha-latest.csv', None),
+    # 58000 AIP-Alpha7-latest.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP-Alpha7-latest.csv', None),
+    # 18000 AIP-Prioritize_Consistent-latest
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP-Prioritize_Consistent-latest.csv', None),
+    # 10000 AIP-Prioritize_New-latest.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP-Prioritize_New-latest.csv', None),
+    # 17500 AIP_blacklist_for_IPs_seen_last_24_hours.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP_blacklist_for_IPs_seen_last_24_hours.csv', None),
+    # 10000 - AIP_historical_blacklist_prioritized_by_newest_attackers.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP_historical_blacklist_prioritized_by_newest_attackers.csv', None),
+    # 18000  AIP_historical_blacklist_prioritized_by_repeated_attackers.csv
+    ('https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/Todays-Blacklists/AIP_historical_blacklist_prioritized_by_repeated_attackers.csv', None),    
 # Checked they still work && update (2023-12-00)
     # Cins 15000
     ('http://cinsscore.com/list/ci-badguys.txt', None),
@@ -443,5 +457,3 @@ if pDebug:
   print(f'Stats: Number of lists: ', len(urls))
   print(f'Stats: Valid: {lineas_validas} Dup: {lineas_duplicadas} Error {lineas_errores} InNet Discards {lineas_in_net}')
   print(f"Total IPs: {len(ips)} Total Networks: {len(redes)} Total Domains: {len(dominios)}")  
-
-
