@@ -1,0 +1,32 @@
+stages:
+  - test
+  - deploy
+
+test:
+  stage: test
+  image: python:3.9
+  before_script:
+    - export PYTHONPATH=$PYTHONPATH:/builds/diegargon/monnet-ansible/src
+    - pip install -r requirements.txt
+    - echo "nameserver 192.168.2.126" > /etc/resolv.conf
+  script:
+    - pytest -v tests/test_monnet_ansible.py
+
+deploy:
+  stage: deploy
+  image: python:3.9
+  script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa  
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H 192.168.2.148 >> ~/.ssh/known_hosts
+    - scp -r . root@192.168.2.148:/opt/monnet-ansible
+    - |
+      ssh root@192.168.2.148 <<EOF      
+      cp /opt/monnet-ansible/files/monnet-ansible.service /etc/systemd/system/monnet-ansible.service
+      systemctl daemon-reload
+      systemctl restart monnet-ansible.service
+      systemctl status monnet-ansible.service
+      EOF
+  only:
+    - main 
